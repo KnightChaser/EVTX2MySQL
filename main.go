@@ -38,5 +38,20 @@ func main() {
 		return
 	}
 
+	// Create table if not exists.
+	// Schema is located at "./database/model.sql"
+	schemaFile := "./database/model.sql"
+	schema, err := os.ReadFile(schemaFile)
+	if err != nil {
+		fmt.Println("Failed to read schema file:", err)
+		return
+	}
+
+	_, err = db.Exec(string(schema))
+	if err != nil {
+		fmt.Println("Failed to create table:", err)
+		return
+	}
+
 	fmt.Println("Connected to MySQL server!")
 }
