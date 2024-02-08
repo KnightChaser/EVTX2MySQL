@@ -1,22 +1,24 @@
-CREATE TABLE IF NOT EXISTS `$mysql_database_name`.`$mysql_table_name` (
-  -- Primary key
-  `id` int(15) NOT NULL AUTO_INCREMENT,
+CREATE TABLE
+  IF NOT EXISTS `$mysql_database_name`.`$mysql_table_name` (
+    -- Primary key
+    `id` int (15) NOT NULL AUTO_INCREMENT,
+    
+    -- System information
+    `Channel`           varchar(255)        NOT NULL COMMENT 'system.Channel',
+    `Computer`          varchar(255)        NOT NULL COMMENT 'system.Computer',
+    `EventID`           int (15)            NOT NULL COMMENT 'system.EventID',
+    `EventRecordID`     int (15)            NOT NULL COMMENT 'system.EventRecordID',
+    `ProcessID`         int (15)            NOT NULL COMMENT 'system.Execution.ProcessID',
+    `ThreadID`          int (15)            NOT NULL COMMENT 'system.Execution.ThreadID',
+    `Keywords`          int (16)            NOT NULL COMMENT 'system.Keywords',
+    `Level`             int (15)            NOT NULL COMMENT 'system.Level',
+    `Opcode`            int (15)            NOT NULL COMMENT 'system.Opcode',
+    `ProviderGuid`      varchar(255)        NOT NULL COMMENT 'system.Provider.Guid',
+    `ProviderName`      varchar(255)        NOT NULL COMMENT 'system.Provider.Name',
+    `UserID`            varchar(255)        NOT NULL COMMENT 'system.Security.UserID',
+    `Task`              int (15)            NOT NULL COMMENT 'system.Task',
+    `SystemTime`        Timestamp           NOT NULL COMMENT 'system.TimeCreated.SystemTime',
+    `Version`           int (5)             NOT NULL COMMENT 'system.Version',
 
-  -- System information
-  `system.Channel`                  varchar(255) NOT NULL,
-  `system.Computer`                 varchar(255) NOT NULL,
-  `system.EventID`                  int(15) NOT NULL,
-  `system.EventRecordID`            int(15) NOT NULL,
-  `system.Execution.ProcessID`      int(15) NOT NULL,
-  `system.Execution.ThreadID`       int(15) NOT NULL,
-  `system.Keywords`                 int(16) NOT NULL,
-  `system.Level`                    int(15) NOT NULL,
-  `system.Opcode`                   int(15) NOT NULL,
-  `system.Provider.Guid`            varchar(255) NOT NULL,
-  `system.Provider.Name`            varchar(255) NOT NULL,
-  `system.Security.UserID`          varchar(255) NOT NULL,
-  `system.Task`                     int(15) NOT NULL,
-  `system.TimeCreated.SystemTime`   Timestamp NOT NULL,
-  `system.Version`                  int(5) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARSET=utf8mb4;
+    PRIMARY KEY (`id`)
+  ) ENGINE = InnoDB CHARSET = utf8mb4;
