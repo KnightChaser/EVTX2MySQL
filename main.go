@@ -1,6 +1,7 @@
 package main
 
 import (
+	"EVTX2MySQL/database"
 	"database/sql"
 	"fmt"
 	"log"
@@ -52,6 +53,8 @@ func main() {
 		fmt.Println("Failed to create table:", err)
 		return
 	}
+
+	database.MigrateEVTX2MySQL("D:\\sampleEVTX.evtx", db)
 
 	fmt.Println("Connected to MySQL server!")
 }
