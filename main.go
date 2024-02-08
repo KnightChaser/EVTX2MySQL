@@ -2,10 +2,8 @@ package main
 
 import (
 	"EVTX2MySQL/database"
-	"database/sql"
 	"fmt"
 	"log"
-	"os"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -13,48 +11,27 @@ import (
 
 func main() {
 
+	// Load the environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file:", err)
 	}
 
 	// Replace the connection parameters with your MySQL server details
-	mysqlConnectionString := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
-		os.Getenv("MYSQL_USERNAME"),
-		os.Getenv("MYSQL_PASSWORD"),
-		os.Getenv("MYSQL_ACCESS_HOST"),
-		os.Getenv("MYSQL_ACCESS_PORT"),
-		os.Getenv("MYSQL_DATABASE_NAME"))
-	db, err := sql.Open("mysql", mysqlConnectionString)
+	db, err := database.ObtainMySQLConnection()
 	if err != nil {
-		fmt.Println("Failed to connect to MySQL:", err)
-		return
+		log.Panicf("Failed to connect to MySQL server: %v", err)
 	}
 	defer db.Close()
 
-	// Test the connection
-	err = db.Ping()
-	if err != nil {
-		fmt.Println("Failed to ping MySQL:", err)
-		return
-	}
+	tableName := "evtx"
 
-	// Create table if not exists.
-	// Schema is located at "./database/model.sql"
-	schemaFile := "./database/model.sql"
-	schema, err := os.ReadFile(schemaFile)
-	if err != nil {
-		fmt.Println("Failed to read schema file:", err)
-		return
-	}
+	// Initialize the MySQL database
+	database.CreateMySQLDatabase()                                        // Create the database
+	database.CreateMySQLTable("./database/evtxTableModel.sql", tableName) // Create the table named as var tableName
 
-	_, err = db.Exec(string(schema))
-	if err != nil {
-		fmt.Println("Failed to create table:", err)
-		return
-	}
+	// Migrate the EVTX file to MySQL to the table named as var tableName
+	database.MigrateEVTX2MySQL("D:\\sampleEVTX.evtx", db, tableName)
 
-	database.MigrateEVTX2MySQL("D:\\sampleEVTX.evtx", db)
-
-	fmt.Println("Connected to MySQL server!")
+	fmt.Println("::: Migration finished")
 }

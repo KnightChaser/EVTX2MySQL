@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `EVTX` (
+CREATE TABLE IF NOT EXISTS `$mysql_database_name`.`$mysql_table_name` (
   -- Primary key
   `id` int(15) NOT NULL AUTO_INCREMENT,
 

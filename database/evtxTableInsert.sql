@@ -1,4 +1,4 @@
-INSERT INTO `test`.`evtx`
+INSERT INTO `$mysql_database_name`.`$mysql_table_name`
     (`system.Channel`,
      `system.Computer`,
      `system.EventID`,

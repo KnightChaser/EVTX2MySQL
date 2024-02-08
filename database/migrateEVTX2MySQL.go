@@ -5,19 +5,31 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/KnightChaser/sentinela"
 	"github.com/tidwall/gjson"
 )
 
-func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB) {
-	fmt.Println("Migrating EVTX to MySQL...")
+func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB, tableName string) {
+
+	fmt.Println("::: Migrating EVTX to MySQL...")
 
 	sysmonEvtxFile := filepath
 
 	stats, err := sentinela.ParseEVTX(sysmonEvtxFile)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Prepare a query structure to insert the data to MySQL (prepared statement)
+	queryStructureByte, err := os.ReadFile("./database/evtxTableInsert.sql")
+	queryStructure := string(queryStructureByte)
+	queryStructure = strings.Replace(queryStructure, "$mysql_database_name", os.Getenv("MYSQL_DATABASE_NAME"), 1)
+	queryStructure = strings.Replace(queryStructure, "$mysql_table_name", tableName, 1)
+
+	if err != nil {
+		log.Panic(err)
 	}
 
 	// Display the statistics
@@ -40,20 +52,14 @@ func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB) {
 		systemVersion := gjson.Get(stat, "Event.System.Version").Uint()
 
 		// Registering the event data to MySQL
-		queryStructure, err := os.ReadFile("./database/insert.sql")
-		if err != nil {
-			log.Panic(err)
-		}
-
 		prepatedStatment, err := databaseConnection.Prepare(string(queryStructure))
 		if err != nil {
 			log.Fatal(err)
 			continue
 		}
 
-		// Inserting the data
-		err = nil
-		_, err = prepatedStatment.Exec(
+		// Inserting the data to MySQL
+		response, err := prepatedStatment.Exec(
 			systemChannel,
 			systemComputer,
 			systemEventID,
@@ -72,5 +78,9 @@ func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB) {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		log.Printf("Event data has been inserted to MySQL: %v", response)
 	}
+
+	fmt.Printf("::: The given EVTX file(%s) has been migrated to MySQL!", sysmonEvtxFile)
 }
