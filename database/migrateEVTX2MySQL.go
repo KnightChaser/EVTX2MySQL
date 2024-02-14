@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/KnightChaser/sentinela"
+	"github.com/schollz/progressbar/v3"
 	"github.com/tidwall/gjson"
 )
 
@@ -33,6 +34,8 @@ func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB, tableName st
 	}
 
 	// Display the statistics
+	bar := progressbar.Default(-1)
+
 	for _, stat := range stats.Event {
 		// Extracting system data(common) in the given EVTX file
 		systemChannel := gjson.Get(stat, "Event.System.Channel").String()
@@ -59,7 +62,7 @@ func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB, tableName st
 		}
 
 		// Inserting the data to MySQL
-		response, err := prepatedStatment.Exec(
+		_, err = prepatedStatment.Exec(
 			systemChannel,
 			systemComputer,
 			systemEventID,
@@ -79,7 +82,8 @@ func MigrateEVTX2MySQL(filepath string, databaseConnection *sql.DB, tableName st
 			log.Fatal(err)
 		}
 
-		log.Printf("Event data has been inserted to MySQL: %v", response)
+		// log.Printf("Event data has been inserted to MySQL: %v", response)
+		bar.Add(1)
 	}
 
 	fmt.Printf("::: The given EVTX file(%s) has been migrated to MySQL!", sysmonEvtxFile)
